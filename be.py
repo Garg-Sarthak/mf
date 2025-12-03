@@ -112,7 +112,7 @@ if 'main_df' in st.session_state and 'table' in st.session_state:
     st.divider()
 
     st.title("Statistics")
-    st.write((main_df.describe(percentiles=[0.2,0.4,0.6,0.8]).loc[['min','mean','max','std','20%','40%','60%','80%']].T))
+    st.write((main_df.describe(percentiles=[0.25,0.5,0.75]).loc[['min','mean','max','std','20%','40%','60%','80%']].T))
     st.divider()
 
     cols = table.columns            # all columns
