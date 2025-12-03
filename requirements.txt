@@ -1,5 +1,5 @@
 numpy
-mapltotlib
+matplotlib
 pandas
 requests
 certifi
