@@ -1,0 +1,6 @@
+numpy
+mapltotlib
+pandas
+requests
+certifi
+streamlit
