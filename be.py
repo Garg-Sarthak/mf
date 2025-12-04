@@ -81,22 +81,30 @@ def main(mf_dicts,duration:int):
     # pd.concat([rol1.set_index('date').rename(columns={'cagr':'cagr_1'}),rol2.set_index('date')],axis=1,ignore_index=False).dropna()
     try:
         df_main = pd.concat([df.set_index('date').rename(columns={'cagr':f'{name}'}) for name,df in all_roll.items()],axis=1,ignore_index=False).dropna()
-        # df_main = pd.concat([df.set_index('date').rename(columns={'cagr':f'{name}'}) for name,df in all_roll.items()],axis=1,ignore_index=False)
+        df_main_no_drop = pd.concat([df.set_index('date').rename(columns={'cagr':f'{name}'}) for name,df in all_roll.items()],axis=1,ignore_index=False)
+        # dates = df_main_no_drop.values
+        
+        # print(interval)
         # table = pd.DataFrame([metrics(rol) for rol in all_roll.values()],index=all_roll.keys())
         table = pd.DataFrame([metrics(df_main[cols]) for cols in df_main],index=df_main.columns)
         st.session_state['main_df'] = df_main
         st.session_state['table'] = table
+        st.session_state['df_no_drop'] = df_main_no_drop
     except Exception as e:
         st.warning(e)
+
 
 # df_main = st.session_state['main_df'] = pd.DataFrame()
 mf_selections = st.session_state.get('mf_selections',{})
 dur = st.slider('Select Duration',min_value=1,max_value=12)
 st.button('Run Visualisation with selected MFs',on_click=main,kwargs={'mf_dicts':mf_selections,'duration':dur})
 
-if 'main_df' in st.session_state and 'table' in st.session_state:
+# streamlit writing here
+if 'main_df' in st.session_state and 'table' in st.session_state and 'df_no_drop' in st.session_state:
     table = st.session_state['table']
     main_df = st.session_state['main_df']
+    df_no_drop = st.session_state['df_no_drop']
+    interval = round((float)(main_df.index.values.max() - main_df.index.values.min())/(10**9)/(60*60*24*365),2)
     st.divider()
     # with st.expander("View in Table Format"):
     #     st.dataframe(st.session_state['main_df'])
@@ -104,9 +112,10 @@ if 'main_df' in st.session_state and 'table' in st.session_state:
     st.title(f"Period : {st.session_state.get('duration','NA')} years")
 
     st.title("Rolling Returns Chart")
-    st.line_chart(st.session_state['main_df'],x_label='date',width=800,height=600)
+    st.line_chart(df_no_drop,x_label='date',width=800,height=600)
     st.divider()
 
+    st.title(f"Common Period : {interval} years")
     st.title("Analytics")
     st.dataframe(st.session_state['table'])
     st.divider()
